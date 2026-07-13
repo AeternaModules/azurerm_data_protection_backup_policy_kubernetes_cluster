@@ -54,5 +54,21 @@ EOT
       priority = number
     })))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.data_protection_backup_policy_kubernetes_clusters : (
+        length(v.default_retention_rule.life_cycle) >= 1
+      )
+    ])
+    error_message = "Each life_cycle list must contain at least 1 items"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.data_protection_backup_policy_kubernetes_clusters : (
+        v.retention_rule == null || alltrue([for item in v.retention_rule : (length(item.life_cycle) >= 1)])
+      )
+    ])
+    error_message = "Each life_cycle list must contain at least 1 items"
+  }
 }
 
